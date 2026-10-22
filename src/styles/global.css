@@ -1,5 +1,3 @@
-@import './tokens.css';
-
 /* CSS Reset & Box Sizing */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -46,6 +44,21 @@ h3 { font-size: 1.5rem; }
 h4 { font-size: 1.25rem; }
 h5 { font-size: 1.1rem; }
 h6 { font-size: 1rem; }
+
+/* Dark mode & dark screen heading contrast overrides */
+.dark-screen h1,
+.dark-screen h2,
+.dark-screen h3,
+.dark-screen h4,
+.dark-screen h5,
+.dark-screen h6,
+.dark h1, .dark h2, .dark h3, .dark h4,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4 {
+  color: #FFFFFF;
+}
 
 p {
   color: var(--text-secondary);

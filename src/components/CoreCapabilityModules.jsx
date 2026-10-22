@@ -2,34 +2,30 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Stack,
-  Graph,
+  Sparkle,
   Storefront,
   GraduationCap,
   Cube,
   Leaf,
-  ArrowRight,
-  ArrowsLeftRight
+  ArrowRight
 } from '@phosphor-icons/react';
+import Container from './Container';
 
-const capabilityModules = [
+const capabilities = [
   {
     id: 'clearinghouse',
     title: 'Clearinghouse & Portal',
     desc: 'Discover authoritative spatial data with rich metadata and trusted sources.',
     icon: Stack,
     image: '/assets/card_clearinghouse_aerial.jpg',
-    alt: 'Aerial view of Abu Dhabi city skyline around waterfront bay',
     link: '/capabilities/clearinghouse'
   },
   {
     id: 'geoai',
     title: 'GeoAI & Spatial Intelligence',
-    desc: 'Turn location data into insight with AI-powered analysis.',
-    icon: Graph,
-    isSplitComparison: true,
-    imageBefore: '/assets/geoai_before.jpg',
-    imageAfter: '/assets/geoai_after.jpg',
-    alt: 'GeoAI satellite change detection before and after comparison',
+    desc: 'Turn location data into insight with AI-powered analytics.',
+    icon: Sparkle,
+    image: '/assets/geoai_after.jpg',
     link: '/capabilities/geoai'
   },
   {
@@ -38,7 +34,6 @@ const capabilityModules = [
     desc: 'Access and share curated datasets, services and applications.',
     icon: Storefront,
     image: '/assets/clearinghouse_cartography.jpg',
-    alt: '3D stacked cartographic spatial data layers',
     link: '/capabilities/marketplace'
   },
   {
@@ -47,109 +42,102 @@ const capabilityModules = [
     desc: 'Develop skills and grow geospatial capability across teams.',
     icon: GraduationCap,
     image: '/assets/capacity_building_gis.jpg',
-    alt: 'Abu Dhabi spatial analytics executive center',
     link: '/capabilities/capacity-building'
   },
   {
     id: 'digital-twin',
     title: 'Digital Twin & 3D Visualisation',
-    desc: 'Understand places, assets and infrastructure in 3D.',
+    desc: 'Interact with 3D models and real-world scenarios.',
     icon: Cube,
     image: '/assets/digital_twin_waterfront.jpg',
-    alt: '3D digital twin waterfront models and bridge',
     link: '/capabilities/digital-twin'
   },
   {
     id: 'open-data',
     title: 'Open Data & Public Engagement',
-    desc: 'Make trusted spatial data easier to access and reuse.',
+    desc: 'Make trusted data easier to access and reuse.',
     icon: Leaf,
     image: '/assets/card_mangroves_aerial.jpg',
-    alt: 'Aerial view of Abu Dhabi Eastern Mangroves and waterways',
     link: '/capabilities/open-data'
   }
 ];
 
 export default function CoreCapabilityModules() {
   return (
-    <div className="core-capabilities-section">
-      {/* Section Header */}
-      <div className="capabilities-header-row">
-        <div className="capabilities-header-info">
-          <div className="capabilities-eyebrow-group">
-            <span className="capabilities-eyebrow-text">EXPLORE THE PLATFORM</span>
-            <span className="capabilities-eyebrow-line" aria-hidden="true" />
+    <section className="py-12 sm:py-16 bg-white border-t border-[#E3E8EF]" aria-label="Core Capability Modules">
+      <Container wide>
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
+          <div className="max-w-2xl space-y-1.5 text-left">
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-0.5 bg-[#FFC20E] rounded-full inline-block" />
+              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#D97706]">
+                Our Capabilities
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0B2545] tracking-tight">
+              Six Core Capability Modules
+            </h2>
+            <p className="text-xs sm:text-sm text-[#5B6B7F] font-normal leading-relaxed">
+              Integrated capabilities to help you discover, analyse, govern and share Abu Dhabi's geospatial data and services.
+            </p>
           </div>
-          <h2 className="capabilities-section-heading">Six Core Capability Modules</h2>
-          <p className="capabilities-section-subhead">
-            A connected set of capabilities to discover, analyse, govern and share Abu Dhabi's spatial data.
-          </p>
-        </div>
 
-        <div className="capabilities-header-cta-wrap">
-          <Link to="/capabilities" className="capabilities-explore-all-link">
+          <Link
+            to="/capabilities"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#1F5FAD] hover:text-[#0B2545] transition-colors shrink-0 group self-start sm:self-auto"
+          >
             <span>Explore all capabilities</span>
-            <span className="circle-arrow-button" aria-hidden="true">
-              <ArrowRight size={18} weight="bold" />
-            </span>
+            <ArrowRight size={15} weight="bold" className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
-      </div>
 
-      {/* 2x3 Cards Grid */}
-      <div className="capabilities-cards-grid">
-        {capabilityModules.map((mod) => {
-          const IconComp = mod.icon;
-          return (
-            <Link
-              key={mod.id}
-              to={mod.link}
-              className="capability-tile-card"
-              aria-label={`Explore ${mod.title}`}
-            >
-              {/* Left Column: Image or Split Comparison */}
-              <div className="tile-image-container">
-                {mod.isSplitComparison ? (
-                  <div className="tile-split-wrapper">
-                    <div className="split-half-img split-left">
-                      <img src={mod.imageBefore} alt="" aria-hidden="true" />
-                    </div>
-                    <div className="split-half-img split-right">
-                      <img src={mod.imageAfter} alt="" aria-hidden="true" />
-                    </div>
-                    <div className="split-center-pill" aria-hidden="true">
-                      <ArrowsLeftRight size={12} weight="bold" />
-                    </div>
-                  </div>
-                ) : (
+        {/* 3 Columns x 2 Rows Compact Horizontal Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
+          {capabilities.map((mod) => {
+            const IconComp = mod.icon;
+            return (
+              <Link
+                key={mod.id}
+                to={mod.link}
+                className="bg-white rounded-xl border border-[#E3E8EF] hover:border-[#1F5FAD] shadow-xs hover:shadow-md transition-all duration-200 grid grid-cols-[38%_minmax(0,1fr)] overflow-hidden group cursor-pointer"
+              >
+                {/* Left Column: Full-bleed image occupying 38% width and 100% height */}
+                <div className="w-full h-full min-h-[145px] bg-slate-100 relative overflow-hidden">
                   <img
                     src={mod.image}
-                    alt={mod.alt}
-                    className="tile-static-img"
+                    alt={mod.title}
+                    className="w-full h-full min-h-full object-cover block transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
                   />
-                )}
-              </div>
+                </div>
 
-              {/* Right Column: Icon, Title, Description, Link */}
-              <div className="tile-content-container">
-                <div>
-                  <div className="tile-icon-square">
-                    <IconComp size={18} weight="fill" />
+                {/* Right Column: Content details with clean padding */}
+                <div className="p-3.5 sm:p-4 min-w-0 flex flex-col justify-between">
+                  <div className="space-y-1">
+                    <div className="w-6 h-6 rounded-md bg-blue-50 text-[#1F5FAD] flex items-center justify-center mb-1 shrink-0">
+                      <IconComp size={15} weight="bold" />
+                    </div>
+
+                    <h3 className="text-xs sm:text-sm font-bold text-[#0B2545] group-hover:text-[#1F5FAD] transition-colors leading-snug line-clamp-1">
+                      {mod.title}
+                    </h3>
+
+                    <p className="text-[11px] sm:text-xs text-[#5B6B7F] line-clamp-2 leading-relaxed font-normal">
+                      {mod.desc}
+                    </p>
                   </div>
-                  <h3 className="tile-title">{mod.title}</h3>
-                  <p className="tile-desc">{mod.desc}</p>
-                </div>
 
-                <div className="tile-action-row">
-                  <span className="tile-action-label">Explore capability</span>
-                  <ArrowRight size={14} weight="bold" className="tile-arrow-icon" />
+                  <div className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1F5FAD] group-hover:text-[#0B2545] pt-1.5">
+                    <span>Explore capability</span>
+                    <ArrowRight size={12} weight="bold" className="group-hover:translate-x-0.5 transition-transform" />
+                  </div>
                 </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
+              </Link>
+            );
+          })}
+        </div>
+      </Container>
+    </section>
   );
 }

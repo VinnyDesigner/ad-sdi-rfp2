@@ -90,37 +90,45 @@ export default function Header() {
 
   const isCapabilitiesActive = location.pathname.startsWith('/capabilities');
 
+  const [lang, setLang] = useState('EN');
+
   return (
     <header className="site-header">
       <Container wide>
         <div className="header-container">
-          {/* Brand Logo & Title */}
+          {/* Brand Logo */}
           <Link to="/" className="brand-link" aria-label="AD-SDI Home">
-            <div className="brand-emblem" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
-                <circle cx="16" cy="16" r="11" stroke="currentColor" strokeWidth="2.5" strokeDasharray="3 3" />
-                <circle cx="16" cy="16" r="4.5" fill="currentColor" />
-                <path d="M16 4v4M16 24v4M4 16h4M24 16h4" stroke="var(--gold-500)" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div className="brand-text">
-              <span className="brand-title">AD-SDI</span>
-              <span className="brand-subtitle">Abu Dhabi Spatial Data Infrastructure</span>
-            </div>
+            <img
+              src="/assets/dge_logo.png"
+              alt="Department of Government Enablement — Abu Dhabi"
+              className="dge-brand-logo"
+            />
           </Link>
 
           {/* Navigation Links */}
           <nav className={`nav-menu ${mobileMenuOpen ? 'open' : ''}`} aria-label="Main Navigation">
-            <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} end>
+            <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} end onClick={() => setMobileMenuOpen(false)}>
               Home
             </NavLink>
 
-            <NavLink to="/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              About AD-SDI
+            <NavLink to="/catalogue" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+              Data & Catalogue
             </NavLink>
 
-            <NavLink to="/platform" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              Platform Overview
+            <NavLink to="/maps-services" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+              Maps & Services
+            </NavLink>
+
+            <NavLink to="/marketplace" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+              Marketplace
+            </NavLink>
+
+            <NavLink to="/open-data" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+              Open Data
+            </NavLink>
+
+            <NavLink to="/developers" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
+              Developers
             </NavLink>
 
             {/* Capabilities Dropdown */}
@@ -160,7 +168,10 @@ export default function Header() {
                         to={item.to}
                         className={`dropdown-item ${isActive ? 'active' : ''}`}
                         role="menuitem"
-                        onClick={() => setDropdownOpen(false)}
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          setMobileMenuOpen(false);
+                        }}
                       >
                         <div
                           className="dropdown-icon"
@@ -179,25 +190,33 @@ export default function Header() {
               )}
             </div>
 
-            <NavLink to="/workflows" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              Workflows
-            </NavLink>
-
-            <NavLink to="/governance" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              Governance
-            </NavLink>
-
-            <NavLink to="/roadmap" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              Roadmap
-            </NavLink>
-
-            <NavLink to="/value" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              Expected Value
-            </NavLink>
+            <div className="mobile-menu-cta">
+              <Link
+                to="/contact"
+                className="btn btn-primary"
+                style={{ width: '100%', justifyContent: 'center' }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Stakeholder Consultation
+              </Link>
+            </div>
           </nav>
 
           {/* Right Header Actions */}
           <div className="header-actions">
+            {/* Language Selector */}
+            <button
+              type="button"
+              className="lang-toggle-btn"
+              onClick={() => setLang(lang === 'EN' ? 'AR' : 'EN')}
+              title="Toggle Language (English / العربية)"
+              aria-label="Language selector"
+            >
+              <span className={lang === 'EN' ? 'lang-active' : ''}>EN</span>
+              <span className="lang-sep">|</span>
+              <span className={lang === 'AR' ? 'lang-active' : ''} style={{ fontFamily: 'var(--font-arabic)' }}>العربية</span>
+            </button>
+
             <Link to="/contact" className="btn btn-primary" style={{ padding: '8px 18px', fontSize: '0.88rem' }}>
               Stakeholder Consultation
             </Link>

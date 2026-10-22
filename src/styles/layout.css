@@ -22,6 +22,30 @@
   align-items: center;
   gap: var(--space-3);
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.brand-link:hover {
+  opacity: 0.92;
+}
+
+.dge-brand-logo {
+  height: 42px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 28px;
+  background-color: var(--border);
+  margin: 0 4px;
+  flex-shrink: 0;
 }
 
 .brand-emblem {
@@ -34,11 +58,14 @@
   justify-content: center;
   color: var(--gold-500);
   box-shadow: 0 2px 8px rgba(11, 37, 69, 0.15);
+  flex-shrink: 0;
 }
 
 .brand-text {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .brand-title {
@@ -47,6 +74,7 @@
   letter-spacing: -0.01em;
   color: var(--navy-900);
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 .brand-subtitle {
@@ -186,6 +214,37 @@
   gap: var(--space-3);
 }
 
+.lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.lang-toggle-btn:hover {
+  background: #FFFFFF;
+  border-color: var(--navy-700);
+  color: var(--navy-900);
+}
+
+.lang-active {
+  color: var(--navy-900);
+  font-weight: 800;
+}
+
+.lang-sep {
+  color: var(--border);
+  font-weight: 300;
+}
+
 .mobile-menu-btn {
   display: none;
   padding: 8px;
@@ -299,11 +358,52 @@
 }
 
 .footer-brand {
-  max-width: 360px;
+  max-width: 380px;
+}
+
+.footer-brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  margin-bottom: var(--space-4);
+  white-space: nowrap;
+  transition: opacity var(--transition-fast);
+}
+
+.footer-brand-link:hover {
+  opacity: 0.92;
+}
+
+.footer-logo-card {
+  background: #FFFFFF;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.dge-footer-logo {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.brand-divider-footer {
+  width: 1px;
+  height: 28px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 0 2px;
+  flex-shrink: 0;
 }
 
 .footer-brand .brand-title {
   color: var(--text-inverse);
+  white-space: nowrap;
 }
 
 .footer-brand .brand-subtitle {

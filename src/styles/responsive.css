@@ -1,4 +1,13 @@
 /* Responsive Media Queries */
+.mobile-menu-cta {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .header-actions .btn-primary {
+    display: none;
+  }
+}
 
 /* Tablet & Smaller Desktops (max-width: 1024px) */
 @media (max-width: 1024px) {
@@ -57,6 +66,15 @@
     --space-12: 36px;
   }
 
+  .dge-brand-logo {
+    height: 32px;
+    max-width: 145px;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
   .mobile-menu-btn {
     display: flex;
   }
@@ -95,6 +113,13 @@
     box-shadow: none;
     border: 1px solid var(--border-light);
     margin-top: var(--space-2);
+  }
+
+  .mobile-menu-cta {
+    display: block;
+    margin-top: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-light);
   }
 
   .capability-grid {
