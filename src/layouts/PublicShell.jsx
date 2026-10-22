@@ -36,6 +36,7 @@ export default function PublicShell() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const isCatalogueWorkspace = location.pathname === '/catalogue' || location.pathname.startsWith('/catalogue/themes');
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -49,9 +50,12 @@ export default function PublicShell() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F7FA] text-[#14213D] font-sans antialiased">
+    <div
+      dir={lang === 'ar' ? 'rtl' : 'ltr'}
+      className={`flex flex-col bg-[#F5F7FA] text-[#14213D] font-sans antialiased ${isCatalogueWorkspace ? 'h-screen overflow-hidden' : 'min-h-screen'}`}
+    >
       {/* Public Top Bar (72px, per brief S01 & Section 4.5) */}
-      <header className="h-[72px] bg-white border-b border-[#E3E8EF] sticky top-0 z-50 px-4 sm:px-6 lg:px-8 shadow-xs">
+      <header className="h-[72px] shrink-0 bg-white border-b border-[#E3E8EF] sticky top-0 z-50 px-4 sm:px-6 lg:px-8 shadow-xs">
         <div className="max-w-[1440px] mx-auto h-full flex items-center justify-between gap-3 lg:gap-4">
           {/* Left: DGE Government Logo (Aspect Ratio Preserved, Brand Text Removed) */}
           <div className="flex items-center shrink-0">
@@ -165,7 +169,7 @@ export default function PublicShell() {
             {/* Workspace Link & Persona Avatar */}
             <div className="flex items-center gap-1.5 sm:gap-2 pl-1.5 border-l border-[#E3E8EF] shrink-0">
               <Link
-                to="/command-centre"
+                to="/workspace"
                 className="hidden sm:inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-semibold bg-[#0B2545] text-white hover:bg-[#13315C] transition-colors shadow-xs shrink-0"
               >
                 <span>Workspace</span>
@@ -225,7 +229,7 @@ export default function PublicShell() {
             ))}
             <div className="pt-3 border-t border-[#E3E8EF] flex flex-col gap-2">
               <Link
-                to="/command-centre"
+                to="/workspace"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full text-center px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#0B2545] text-white hover:bg-[#13315C] transition-colors"
               >
@@ -237,8 +241,8 @@ export default function PublicShell() {
       </header>
 
       {/* Main Outlet */}
-      <main className="flex-1">
-        {isHomePage ? (
+      <main className={`flex-1 min-h-0 ${isCatalogueWorkspace ? 'h-[calc(100vh-72px)] overflow-hidden flex flex-col' : ''}`}>
+        {isHomePage || isCatalogueWorkspace ? (
           <Outlet />
         ) : (
           <div className="max-w-[1400px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -247,35 +251,37 @@ export default function PublicShell() {
         )}
       </main>
 
-      {/* Footer: Home page uses the full rich footer; other public pages use the slim sovereign footer per brief */}
-      {isHomePage ? (
-        <Footer />
-      ) : (
-        <footer className="h-14 bg-[#0B2545] text-white border-t border-[#13315C] px-6 text-xs flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <span className="font-semibold text-slate-200">
-              © 2026 Department of Government Enablement (DGE)
-            </span>
-            <span className="text-slate-400 hidden md:inline">•</span>
-            <span className="text-slate-400 hidden md:inline">
-              100% UAE Sovereign Infrastructure & ISO 19115 Aligned
-            </span>
-          </div>
-          <div className="flex items-center gap-4 text-slate-300">
-            <Link to="/open-data" className="hover:text-white transition-colors">
-              Open Data License
-            </Link>
-            <Link to="/developers" className="hover:text-white transition-colors">
-              APIs
-            </Link>
-            <Link to="/command-centre" className="hover:text-[#FFC20E] transition-colors">
-              Operational Workspace
-            </Link>
-            <span className="text-[11px] text-slate-400 opacity-70">
-              Illustrative data — conceptual design
-            </span>
-          </div>
-        </footer>
+      {/* Footer: Home page uses the full rich footer; other public pages use the slim sovereign footer; Catalogue workspace uses full-bleed layout */}
+      {!isCatalogueWorkspace && (
+        isHomePage ? (
+          <Footer />
+        ) : (
+          <footer className="h-14 bg-[#0B2545] text-white border-t border-[#13315C] px-6 text-xs flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <span className="font-semibold text-slate-200">
+                © 2026 Department of Government Enablement (DGE)
+              </span>
+              <span className="text-slate-400 hidden md:inline">•</span>
+              <span className="text-slate-400 hidden md:inline">
+                100% UAE Sovereign Infrastructure & ISO 19115 Aligned
+              </span>
+            </div>
+            <div className="flex items-center gap-4 text-slate-300">
+              <Link to="/open-data" className="hover:text-white transition-colors">
+                Open Data License
+              </Link>
+              <Link to="/developers" className="hover:text-white transition-colors">
+                APIs
+              </Link>
+              <Link to="/command-centre" className="hover:text-[#FFC20E] transition-colors">
+                Operational Workspace
+              </Link>
+              <span className="text-[11px] text-slate-400 opacity-70">
+                Illustrative data — conceptual design
+              </span>
+            </div>
+          </footer>
+        )
       )}
 
       {/* Global Modals & Drawers */}

@@ -118,12 +118,30 @@ export default function ApiCataloguePage() {
       </div>
 
       {/* Grid of APIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filtered.map((api) => (
-          <div
-            key={api.slug}
-            className="bg-white rounded-2xl p-6 border border-[#E3E8EF] shadow-xs hover:border-[#1F5FAD]/40 transition-all flex flex-col justify-between space-y-4"
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-2xl p-12 text-center border border-[#E3E8EF] shadow-xs space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#1F5FAD] flex items-center justify-center mx-auto shadow-2xs">
+            <FileCode size={28} />
+          </div>
+          <h2 className="text-base font-bold text-[#0B2545]">No API endpoints found</h2>
+          <p className="text-xs text-[#5B6B7F] max-w-md mx-auto leading-relaxed">
+            No developer APIs match your search query. Try searching for "cadastre", "tiles", or "geocoding".
+          </p>
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="px-4 py-2 rounded-xl bg-[#0B2545] hover:bg-[#13315C] text-white text-xs font-semibold transition-colors cursor-pointer"
           >
+            Clear Search
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filtered.map((api) => (
+            <div
+              key={api.slug}
+              className="bg-white rounded-2xl p-6 border border-[#E3E8EF] shadow-xs hover:border-[#1F5FAD]/40 transition-all flex flex-col justify-between space-y-4"
+            >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -170,6 +188,7 @@ export default function ApiCataloguePage() {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }

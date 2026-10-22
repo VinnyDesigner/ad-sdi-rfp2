@@ -69,53 +69,65 @@ export default function NotificationDrawer() {
 
         {/* Notification List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {notifications.map((item) => {
-            let Icon = Info;
-            let iconBg = 'bg-blue-50 text-[#1F5FAD]';
-            if (item.type === 'success') {
-              Icon = CheckCircle;
-              iconBg = 'bg-emerald-50 text-[#1E9E6A]';
-            } else if (item.type === 'warning') {
-              Icon = Warning;
-              iconBg = 'bg-amber-50 text-[#E8A317]';
-            }
-
-            return (
-              <div
-                key={item.id}
-                onClick={() => markNotificationRead(item.id)}
-                className={`p-4 rounded-xl border transition-all duration-200 flex gap-3 relative ${
-                  item.read
-                    ? 'bg-white border-[#E3E8EF] opacity-80 hover:opacity-100'
-                    : 'bg-[#F9FBFD] border-[#7A9CC6]/40 shadow-sm'
-                }`}
-              >
-                {!item.read && (
-                  <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-[#FFC20E]" />
-                )}
-                <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${iconBg}`}>
-                  <Icon size={18} weight="fill" />
-                </div>
-                <div className="flex-1 min-w-0 pr-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-xs font-bold text-[#14213D] truncate">{item.title}</h4>
-                    <span className="text-[11px] text-[#5B6B7F] shrink-0">{item.time}</span>
-                  </div>
-                  <p className="text-xs text-[#5B6B7F] mt-1 leading-relaxed">{item.message}</p>
-                  {item.link && (
-                    <Link
-                      to={item.link}
-                      onClick={() => setIsNotificationDrawerOpen(false)}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#1F5FAD] hover:text-[#0B2545] mt-2 group"
-                    >
-                      View in workspace
-                      <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-                    </Link>
-                  )}
-                </div>
+          {notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center p-6 space-y-3">
+              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                <Bell size={24} />
               </div>
-            );
-          })}
+              <div className="text-sm font-bold text-[#14213D]">No notifications</div>
+              <p className="text-xs text-[#5B6B7F] max-w-xs">
+                You are all caught up. Sovereign QA alerts, approval requests, and security logs will appear here.
+              </p>
+            </div>
+          ) : (
+            notifications.map((item) => {
+              let Icon = Info;
+              let iconBg = 'bg-blue-50 text-[#1F5FAD]';
+              if (item.type === 'success') {
+                Icon = CheckCircle;
+                iconBg = 'bg-emerald-50 text-[#1E9E6A]';
+              } else if (item.type === 'warning') {
+                Icon = Warning;
+                iconBg = 'bg-amber-50 text-[#E8A317]';
+              }
+
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => markNotificationRead(item.id)}
+                  className={`p-4 rounded-xl border transition-all duration-200 flex gap-3 relative ${
+                    item.read
+                      ? 'bg-white border-[#E3E8EF] opacity-80 hover:opacity-100'
+                      : 'bg-[#F9FBFD] border-[#7A9CC6]/40 shadow-sm'
+                  }`}
+                >
+                  {!item.read && (
+                    <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-[#FFC20E]" />
+                  )}
+                  <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${iconBg}`}>
+                    <Icon size={18} weight="fill" />
+                  </div>
+                  <div className="flex-1 min-w-0 pr-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="text-xs font-bold text-[#14213D] truncate">{item.title}</h4>
+                      <span className="text-[11px] text-[#5B6B7F] shrink-0">{item.time}</span>
+                    </div>
+                    <p className="text-xs text-[#5B6B7F] mt-1 leading-relaxed">{item.message}</p>
+                    {item.link && (
+                      <Link
+                        to={item.link}
+                        onClick={() => setIsNotificationDrawerOpen(false)}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[#1F5FAD] hover:text-[#0B2545] mt-2 group"
+                      >
+                        View in workspace
+                        <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* Footer */}

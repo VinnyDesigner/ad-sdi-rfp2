@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AppContext = createContext(null);
 
@@ -359,11 +359,38 @@ export function AppProvider({ children }) {
   const [auditLog, setAuditLog] = useState(INITIAL_AUDIT_LOG);
   const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   const [toasts, setToasts] = useState([]);
-  const [lang, setLang] = useState('en');
+  const [lang, setLangState] = useState(() => {
+    try {
+      return localStorage.getItem('adsdi_lang') || 'en';
+    } catch {
+      return 'en';
+    }
+  });
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
   const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Persistent bookmarked datasets
+  const [bookmarkedDatasetIds, setBookmarkedDatasetIds] = useState(() => {
+    try {
+      const stored = localStorage.getItem('adsdi_saved_datasets');
+      return stored ? JSON.parse(stored) : ['land-parcels-cadastre'];
+    } catch {
+      return ['land-parcels-cadastre'];
+    }
+  });
+
+  const setLang = (newLang) => {
+    setLangState(newLang);
+    try {
+      localStorage.setItem('adsdi_lang', newLang);
+    } catch (_) {}
+  };
+
+  const toggleLang = () => {
+    setLang(lang === 'en' ? 'ar' : 'en');
+  };
 
   const user = PERSONAS[currentPersonaKey] || PERSONAS.fatima;
 
@@ -373,6 +400,12 @@ export function AppProvider({ children }) {
     document.documentElement.lang = lang;
   }, [lang]);
 
+  // Translation helper
+  const t = useCallback(
+    (path, fallback = '') => translate(lang, path, fallback),
+    [lang]
+  );
+
   // Toast helper
   const addToast = (title, message = '', type = 'info') => {
     const id = Date.now() + Math.random();
@@ -381,6 +414,35 @@ export function AppProvider({ children }) {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 4500);
   };
+
+  // Toggle bookmark helper
+  const toggleBookmark = (id) => {
+    setBookmarkedDatasetIds((prev) => {
+      const exists = prev.includes(id);
+      let next;
+      if (exists) {
+        next = prev.filter((item) => item !== id);
+        addToast(
+          lang === 'ar' ? 'تمت الإزالة من المفضلة' : 'Bookmark Removed',
+          lang === 'ar' ? 'تمت إزالة مجموعة البيانات من قائمة الحفظ الخاصة بك.' : 'Dataset removed from your saved list.',
+          'info'
+        );
+      } else {
+        next = [...prev, id];
+        addToast(
+          lang === 'ar' ? 'تم الحفظ في مساحة العمل' : 'Saved to My Datasets',
+          lang === 'ar' ? 'تم حفظ مجموعة البيانات في مساحة العمل بنجاح.' : 'Dataset saved to your personal workspace.',
+          'success'
+        );
+      }
+      try {
+        localStorage.setItem('adsdi_saved_datasets', JSON.stringify(next));
+      } catch (_) {}
+      return next;
+    });
+  };
+
+  const isBookmarked = (id) => bookmarkedDatasetIds.includes(id);
 
   const removeToast = (id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -582,7 +644,11 @@ export function AppProvider({ children }) {
         removeToast,
         lang,
         setLang,
-        toggleLang: () => setLang((prev) => (prev === 'en' ? 'ar' : 'en')),
+        toggleLang,
+        t,
+        bookmarkedDatasetIds,
+        toggleBookmark,
+        isBookmarked,
         isSearchModalOpen,
         setIsSearchModalOpen,
         isNotificationDrawerOpen,

@@ -17,6 +17,7 @@ import {
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import { OGC_SERVICES } from './ServicesPage';
+import CatalogueMap from '../components/catalogue/CatalogueMap';
 
 export default function MapsServices() {
   const { addToast } = useApp();
@@ -182,39 +183,15 @@ export default function MapsServices() {
           </div>
         </div>
 
-        {/* Viewport with balanced height ~ 280px-320px */}
-        <div className="h-64 sm:h-72 lg:h-80 relative overflow-hidden bg-slate-950">
-          <img
-            src={
-              activeLayer === 'satellite'
-                ? '/assets/hero_abudhabi_aerial.jpg'
-                : activeLayer === 'cadastre'
-                ? '/assets/theme_cadastre.jpg'
-                : '/assets/theme_environment.jpg'
-            }
-            alt="Abu Dhabi Geographic Sandbox"
-            className="w-full h-full object-cover opacity-85 transition-opacity duration-300"
+        {/* Real Geographic Map Sandbox Viewport */}
+        <div className="h-72 sm:h-80 lg:h-96 relative overflow-hidden bg-slate-950">
+          <CatalogueMap
+            showThemeDock={false}
+            compact={true}
+            initialBasemap={activeLayer === 'cadastre' ? 'canvas' : 'satellite'}
+            initialZoom={11}
+            showCoordinateBar={true}
           />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0B2545]/90 via-transparent to-transparent pointer-events-none" />
-
-          {/* Coordinate Readout */}
-          <div className="absolute bottom-3 left-4 bg-[#0B2545]/85 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-[#1E4976] text-[11px] font-mono flex items-center gap-3">
-            <Crosshair size={13} className="text-[#2BA6DE]" />
-            <span>24.4539° N, 54.3773° E</span>
-            <span>•</span>
-            <span className="text-[#FFC20E]">Scale 1 : 25,000</span>
-          </div>
-
-          <div className="absolute bottom-3 right-4">
-            <Link
-              to="/map-viewer"
-              className="px-4 py-1.5 rounded-xl bg-white text-[#0B2545] hover:bg-slate-100 text-xs font-bold shadow-md transition-colors inline-flex items-center gap-1.5"
-            >
-              <span>Explore in Viewer</span>
-              <ArrowRight size={13} />
-            </Link>
-          </div>
         </div>
       </div>
 

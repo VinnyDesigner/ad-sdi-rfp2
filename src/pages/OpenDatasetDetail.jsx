@@ -22,6 +22,25 @@ export default function OpenDatasetDetail() {
   const dataset = getDatasetBySlug(datasetSlug) || DATASETS[1];
 
   const triggerDownload = (format) => {
+    const dataContent = {
+      type: 'FeatureCollection',
+      dataset: dataset.title,
+      license: 'Abu Dhabi Open Government License',
+      crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::3997' } },
+      features: dataset.features || []
+    };
+    const extension = format.toLowerCase().includes('json') ? 'geojson' : 'json';
+    const blob = new Blob([JSON.stringify(dataContent, null, 2)], {
+      type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${dataset.slug || 'open-data'}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
     addToast(`Downloaded ${dataset.title} in ${format} format`, 'success');
   };
 

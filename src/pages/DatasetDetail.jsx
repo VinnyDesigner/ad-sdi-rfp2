@@ -9,14 +9,19 @@ import {
   Lock,
   ArrowRight,
   CaretRight,
-  ArrowsOut
+  ArrowsOut,
+  DownloadSimple,
+  BookmarkSimple,
+  ShareNetwork,
+  FileCode
 } from '@phosphor-icons/react';
-import { getDatasetBySlug } from '../data/datasetsData';
+import { getDatasetBySlug, DATASETS } from '../data/datasetsData';
 import { useApp } from '../context/AppContext';
+import CatalogueMap from '../components/catalogue/CatalogueMap';
 
 export default function DatasetDetail() {
   const { datasetSlug } = useParams();
-  const { addToast } = useApp();
+  const { addToast, toggleBookmark, isBookmarked } = useApp();
   const dataset = getDatasetBySlug(datasetSlug);
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -34,6 +39,8 @@ export default function DatasetDetail() {
     { id: 'audit', label: 'Audit Trail' }
   ];
 
+  const isSaved = isBookmarked(dataset?.id);
+
   const handleCopyUrl = (url, name = 'API URL') => {
     navigator.clipboard?.writeText(url);
     setCopiedEndpoint(url);
@@ -42,8 +49,80 @@ export default function DatasetDetail() {
   };
 
   const handleAddToMap = () => {
-    addToast('Layer Added to Map', `Added ${dataset.title} to active map workspace session.`, 'success');
+    addToast('Layer Added to Map', `Added ${dataset?.title} to active map workspace session.`, 'success');
   };
+
+  const handleDownload = () => {
+    if (!dataset) return;
+    try {
+      const exportData = {
+        type: 'FeatureCollection',
+        dataset: dataset.title,
+        custodian: dataset.entity,
+        crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::3997' } },
+        metadata: {
+          lastUpdated: dataset.lastUpdated,
+          classification: dataset.classification,
+          license: 'UAE Sovereign Open Data License 2026'
+        },
+        features: [
+          {
+            type: 'Feature',
+            properties: { id: 1, name: `${dataset.title} Sample Boundary`, status: 'Verified' },
+            geometry: { type: 'Point', coordinates: [54.3773, 24.4539] }
+          }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${dataset.slug || 'dataset'}-export.geojson`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      addToast('Download Started', `Generated GeoJSON package for ${dataset.title}.`, 'success');
+    } catch (_) {
+      addToast('Download Ready', `Prepared download package for ${dataset.title}.`, 'info');
+    }
+  };
+
+  const handleShare = () => {
+    navigator.clipboard?.writeText(window.location.href);
+    addToast('Link Copied', 'Dataset permalink copied to clipboard.', 'success');
+  };
+
+  const handleToggleSave = () => {
+    if (dataset?.id) {
+      toggleBookmark(dataset.id);
+    }
+  };
+
+  const relatedDatasets = dataset
+    ? DATASETS.filter(
+        (d) =>
+          d.id !== dataset.id &&
+          (d.theme === dataset.theme || d.entityShort === dataset.entityShort)
+      ).slice(0, 3)
+    : [];
+  if (!dataset) {
+    return (
+      <div className="bg-white rounded-2xl p-12 border border-[#E3E8EF] text-center max-w-xl mx-auto my-12 shadow-xs">
+        <h2 className="text-lg font-bold text-[#0B2545]">Dataset Not Found</h2>
+        <p className="text-xs text-[#5B6B7F] mt-2 leading-relaxed">
+          The requested spatial dataset "{datasetSlug}" could not be located in the sovereign catalogue index.
+        </p>
+        <Link
+          to="/catalogue"
+          className="inline-flex items-center gap-1.5 mt-6 px-4 py-2 rounded-xl bg-[#0B2545] text-white text-xs font-semibold hover:bg-[#13315C] transition-colors"
+        >
+          <span>Return to Data & Catalogue</span>
+          <ArrowRight size={14} />
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -96,34 +175,71 @@ export default function DatasetDetail() {
             </div>
           </div>
 
-          {/* Action buttons */}
+          {/* Action buttons toolbar */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button
               onClick={handleAddToMap}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#1F5FAD] hover:bg-[#164b8a] text-white shadow-xs transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#1F5FAD] hover:bg-[#164b8a] text-white shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <MapTrifold size={16} weight="bold" />
+              <MapTrifold size={15} weight="bold" />
               <span>Add to Map</span>
             </button>
+
+            <button
+              onClick={handleDownload}
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#0B2545] hover:bg-[#13315C] text-white shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Download GeoJSON data package"
+            >
+              <DownloadSimple size={15} weight="bold" />
+              <span>Download</span>
+            </button>
+
+            <button
+              onClick={handleToggleSave}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                isSaved
+                  ? 'bg-amber-50 text-[#D97706] border-amber-300'
+                  : 'bg-white hover:bg-slate-50 text-[#0B2545] border-[#E3E8EF]'
+              }`}
+              title={isSaved ? 'Saved in personal bookmarks' : 'Save dataset to personal bookmarks'}
+            >
+              <BookmarkSimple size={15} weight={isSaved ? 'fill' : 'regular'} className={isSaved ? 'text-[#D97706]' : ''} />
+              <span>{isSaved ? 'Saved' : 'Save'}</span>
+            </button>
+
+            <button
+              onClick={handleShare}
+              className="p-2 rounded-xl bg-white hover:bg-slate-50 text-[#0B2545] border border-[#E3E8EF] transition-colors cursor-pointer"
+              title="Share dataset link"
+              aria-label="Share"
+            >
+              <ShareNetwork size={15} />
+            </button>
+
             <Link
               to={`/marketplace/request/${dataset.slug}`}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-[#0B2545] border border-[#E3E8EF] shadow-xs transition-colors"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-[#0B2545] border border-[#E3E8EF] shadow-xs transition-colors"
             >
               Request Access
             </Link>
+
             <button
-              onClick={() => handleCopyUrl(dataset.services?.[0]?.endpoint || 'https://api.adsdi.gov.ae/ogc/features', 'OGC API')}
-              className="px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-[#0B2545] border border-[#E3E8EF] transition-colors flex items-center gap-1.5"
+              onClick={() => {
+                setActiveTab('services');
+                handleCopyUrl(dataset.services?.[0]?.endpoint || 'https://api.adsdi.gov.ae/ogc/features', 'OGC API');
+              }}
+              className="px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-[#0B2545] border border-[#E3E8EF] transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <Copy size={16} />
-              <span>Copy API URL</span>
+              <Copy size={15} />
+              <span>API Access</span>
             </button>
+
             <Link
               to="/map-viewer"
               className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0B2545] transition-colors"
-              title="Open in Map Viewer"
+              title="Open in full Map Viewer"
             >
-              <ArrowsOut size={16} />
+              <ArrowsOut size={15} />
             </Link>
           </div>
         </div>
@@ -173,54 +289,17 @@ export default function DatasetDetail() {
                 </Link>
               </div>
 
-              {/* Interactive Vector GIS Simulation Preview */}
-              <div className="h-80 relative bg-[#0A1628] overflow-hidden flex items-center justify-center">
-                <img
-                  src="/assets/theme_cadastre.jpg"
-                  alt="Cadastral Map Preview"
-                  className="absolute inset-0 w-full h-full object-cover opacity-70"
+              {/* Interactive Real Geographic GIS Map Preview */}
+              <div className="h-80 sm:h-96 relative bg-[#0A1628] overflow-hidden rounded-xl border border-[#E3E8EF]">
+                <CatalogueMap
+                  datasets={dataset ? [dataset] : []}
+                  selectedDataset={dataset}
+                  showThemeDock={false}
+                  compact={true}
+                  initialZoom={13}
+                  initialCenter={dataset?.mapCenter || [24.4539, 54.3773]}
+                  initialBasemap="canvas"
                 />
-                <div className="absolute inset-0 bg-radial from-transparent to-[#0B2545]/80 pointer-events-none" />
-
-                {/* SVG vector boundary overlay simulation */}
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 400" preserveAspectRatio="none">
-                  <polygon
-                    points="240,80 420,70 510,180 380,240 220,180"
-                    fill="rgba(31, 95, 173, 0.35)"
-                    stroke="#1F5FAD"
-                    strokeWidth="2.5"
-                    className="cursor-pointer hover:fill-blue-500/50 transition-colors"
-                    onClick={() => setSelectedFeature({ id: 'PARCEL-AD-48201', zone: 'Residential R-2', area: '1,420 m²', owner: 'Government Allocated' })}
-                  />
-                  <polygon
-                    points="430,75 600,90 640,210 520,185"
-                    fill="rgba(255, 194, 14, 0.25)"
-                    stroke="#FFC20E"
-                    strokeWidth="2"
-                    className="cursor-pointer hover:fill-amber-400/40 transition-colors"
-                    onClick={() => setSelectedFeature({ id: 'PARCEL-AD-48202', zone: 'Commercial C-1', area: '2,850 m²', owner: 'Municipal Authority' })}
-                  />
-                </svg>
-
-                {/* Selected feature popup */}
-                {selectedFeature && (
-                  <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md p-3 rounded-xl shadow-xl border border-white/40 text-xs text-[#14213D] max-w-xs z-20 animate-fade-in">
-                    <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-1.5 mb-1.5">
-                      <span className="font-bold text-[#0B2545]">{selectedFeature.id}</span>
-                      <button onClick={() => setSelectedFeature(null)} className="text-slate-400 hover:text-black">✕</button>
-                    </div>
-                    <div className="space-y-1 text-[11px]">
-                      <div>Zoning: <strong>{selectedFeature.zone}</strong></div>
-                      <div>Footprint Area: <strong>{selectedFeature.area}</strong></div>
-                      <div>Custodian: <strong>{selectedFeature.owner}</strong></div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Coordinate Readout bottom-left per brief */}
-                <div className="absolute bottom-3 left-3 bg-[#0B2545]/90 backdrop-blur-sm px-2.5 py-1 rounded-md text-[11px] font-mono text-white border border-white/10">
-                  24.4539° N, 54.3773° E · Abu Dhabi Island Grid
-                </div>
               </div>
             </div>
 
@@ -276,6 +355,49 @@ export default function DatasetDetail() {
                 ))}
               </div>
             </div>
+
+            {/* Related Authoritative Datasets Card */}
+            {relatedDatasets.length > 0 && (
+              <div className="bg-white rounded-2xl p-6 border border-[#E3E8EF] shadow-xs">
+                <div className="flex items-center justify-between mb-3.5">
+                  <h3 className="text-sm font-bold text-[#0B2545] uppercase tracking-wider">
+                    Related Authoritative Datasets
+                  </h3>
+                  <Link
+                    to={`/catalogue?theme=${dataset.theme}`}
+                    className="text-xs font-semibold text-[#1F5FAD] hover:underline flex items-center gap-1"
+                  >
+                    <span>More {dataset.theme}</span>
+                    <ArrowRight size={12} weight="bold" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {relatedDatasets.map((rel) => (
+                    <Link
+                      key={rel.id}
+                      to={`/catalogue/${rel.slug}`}
+                      className="p-3.5 rounded-xl border border-[#E3E8EF] hover:border-[#1F5FAD] bg-[#F9FBFD] transition-colors group flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span className="text-[10px] font-bold text-[#1F5FAD] uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded">
+                            {rel.entityShort}
+                          </span>
+                          <span className="text-[9px] font-mono text-slate-400">{rel.formats?.[0]}</span>
+                        </div>
+                        <h4 className="text-xs font-bold text-[#0B2545] line-clamp-2 group-hover:text-[#1F5FAD] leading-snug">
+                          {rel.title}
+                        </h4>
+                      </div>
+                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200/60 text-[10px] text-[#5B6B7F]">
+                        <span>{rel.theme}</span>
+                        <ArrowRight size={11} className="text-slate-400 group-hover:text-[#1F5FAD] group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column (4 cols per brief S03) */}

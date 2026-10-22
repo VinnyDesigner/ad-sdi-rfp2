@@ -18,7 +18,8 @@ import {
   BookOpen,
   GraduationCap,
   Gauge,
-  ChatCircleDots
+  ChatCircleDots,
+  House
 } from '@phosphor-icons/react';
 import { useApp } from '../context/AppContext';
 import ToastContainer from '../components/ToastContainer';
@@ -49,47 +50,60 @@ export default function WorkspaceShell() {
 
   const navGroups = [
     {
-      group: 'DISCOVER',
+      group: 'WORKSPACE',
+      groupAr: 'مساحة العمل',
       items: [
-        { to: '/workspace/catalogue', label: 'Catalogue', icon: Database },
-        { to: '/map-viewer', label: 'Map Viewer', icon: MapTrifold },
-        { to: '/workspace/marketplace', label: 'Marketplace', icon: Storefront }
+        { to: '/workspace', label: 'My Workspace', labelAr: 'مساحة العمل الخاصة بي', icon: House }
+      ]
+    },
+    {
+      group: 'DISCOVER',
+      groupAr: 'استكشاف',
+      items: [
+        { to: '/workspace/catalogue', label: 'Catalogue', labelAr: 'فهرس البيانات', icon: Database },
+        { to: '/map-viewer', label: 'Map Viewer', labelAr: 'مستعرض الخرائط', icon: MapTrifold },
+        { to: '/workspace/marketplace', label: 'Marketplace', labelAr: 'سوق البيانات', icon: Storefront }
       ]
     },
     {
       group: 'BUILD',
+      groupAr: 'بناء وتطوير',
       items: [
-        { to: '/geoai-studio', label: 'GeoAI Studio', icon: Sparkle },
-        { to: '/geoai-assistant', label: 'GeoAI Assistant', icon: ChatCircleDots },
-        { to: '/digital-twin', label: 'Digital Twin', icon: Cube },
-        { to: '/workspace/services', label: 'APIs & Services', icon: PlugsConnected }
+        { to: '/geoai-studio', label: 'GeoAI Studio', labelAr: 'استوديو الذكاء الجغرافي', icon: Sparkle },
+        { to: '/geoai-assistant', label: 'GeoAI Assistant', labelAr: 'مساعد الذكاء الاصطناعي', icon: ChatCircleDots },
+        { to: '/digital-twin', label: 'Digital Twin', labelAr: 'التوأم الرقمي ثلاثي الأبعاد', icon: Cube },
+        { to: '/workspace/services', label: 'APIs & Services', labelAr: 'واجهات برمجة التطبيقات', icon: PlugsConnected }
       ]
     },
     {
       group: 'GOVERN',
+      groupAr: 'حوكمة وجودة',
       items: [
-        { to: '/publishing', label: 'Publishing & Approvals', icon: CheckSquare },
-        { to: '/quality-sla', label: 'Quality & SLA', icon: Pulse },
-        { to: '/security-access', label: 'Security & Access', icon: ShieldCheck },
-        { to: '/workspace/governance', label: 'Policies & Standards', icon: BookOpen }
+        { to: '/publishing', label: 'Publishing & Approvals', labelAr: 'النشر والموافقات', icon: CheckSquare },
+        { to: '/quality-sla', label: 'Quality & SLA', labelAr: 'الجودة واتفاقيات الخدمة', icon: Pulse },
+        { to: '/security-access', label: 'Security & Access', labelAr: 'الأمن وإدارة الوصول', icon: ShieldCheck },
+        { to: '/workspace/governance', label: 'Policies & Standards', labelAr: 'السياسات والمعايير', icon: BookOpen }
       ]
     },
     {
       group: 'ENABLE',
+      groupAr: 'تمكين وبناء قدرات',
       items: [
-        { to: '/geomaturity', label: 'GeoMaturity & Training', icon: GraduationCap }
+        { to: '/geomaturity', label: 'GeoMaturity & Training', labelAr: 'النضج الجغرافي والتدريب', icon: GraduationCap }
       ]
     },
     {
       group: 'PROGRAMME',
+      groupAr: 'إدارة البرنامج',
       items: [
-        { to: '/command-centre', label: 'Command Centre', icon: Gauge }
+        { to: '/command-centre', label: 'Command Centre', labelAr: 'مركز القيادة والعمليات', icon: Gauge }
       ]
     }
   ];
 
   return (
     <div
+      dir={lang === 'ar' ? 'rtl' : 'ltr'}
       className={`min-h-screen flex flex-col font-sans antialiased ${
         isDarkScreen ? 'dark-screen bg-[#0A1628] text-white' : 'bg-[#F5F7FA] text-[#14213D]'
       }`}
@@ -114,19 +128,16 @@ export default function WorkspaceShell() {
           </Link>
         </div>
 
-        {/* Center: Global Search Field (480px, Navy-700 fill per brief) */}
+        {/* Center: Global Search Field */}
         <div className="hidden lg:flex flex-1 max-w-[480px]">
           <button
             onClick={() => setIsSearchModalOpen(true)}
-            className="w-full h-10 bg-[#13315C] hover:bg-[#1C4378] text-left px-3 rounded-lg border border-white/10 flex items-center justify-between text-xs text-slate-300 transition-colors"
+            className="w-full h-10 bg-[#13315C] hover:bg-[#1C4378] text-left px-3 rounded-lg border border-white/10 flex items-center justify-between text-xs text-slate-300 transition-colors cursor-pointer"
           >
             <span className="flex items-center gap-2 truncate">
               <MagnifyingGlass size={16} className="text-[#FFC20E]" weight="bold" />
               <span>Search datasets, services, maps, models...</span>
             </span>
-            <kbd className="font-mono text-[10px] bg-[#0B2545] px-1.5 py-0.5 rounded text-slate-300 border border-white/10">
-              ⌘K
-            </kbd>
           </button>
         </div>
 
@@ -143,7 +154,7 @@ export default function WorkspaceShell() {
           {/* Help */}
           <button
             onClick={() => alert('AD-SDI Operational Help Desk: Contact dge.support@adsdi.ae or dial 800-AD-SDI')}
-            className="p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+            className="p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
             title="Help & Documentation"
           >
             <Question size={18} />
@@ -152,7 +163,7 @@ export default function WorkspaceShell() {
           {/* Notification bell with gold badge "3" per brief */}
           <button
             onClick={() => setIsNotificationDrawerOpen(true)}
-            className="relative p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+            className="relative p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
             title="Notifications"
           >
             <Bell size={18} weight="bold" />
@@ -163,13 +174,40 @@ export default function WorkspaceShell() {
             )}
           </button>
 
-          {/* Language toggle: EN | ع per brief */}
-          <button
-            onClick={toggleLang}
-            className="px-2 py-1 text-xs font-semibold text-slate-300 hover:text-white rounded hover:bg-white/5 transition-colors"
+          {/* Compact Language Selector: EN | AR */}
+          <div
+            className="inline-flex items-center h-8 px-1.5 py-0.5 rounded-lg border border-white/20 bg-[#13315C] text-xs font-semibold shrink-0 select-none"
+            role="group"
+            aria-label="Language selector"
           >
-            {lang === 'en' ? 'EN | ع' : 'ع | EN'}
-          </button>
+            <button
+              type="button"
+              onClick={() => toggleLang && lang !== 'en' && toggleLang()}
+              className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+                lang === 'en'
+                  ? 'text-white font-bold bg-[#0B2545] shadow-2xs'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="English"
+              aria-pressed={lang === 'en'}
+            >
+              EN
+            </button>
+            <span className="text-white/30 mx-0.5 text-xs select-none" aria-hidden="true">|</span>
+            <button
+              type="button"
+              onClick={() => toggleLang && lang !== 'ar' && toggleLang()}
+              className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+                lang === 'ar'
+                  ? 'text-white font-bold bg-[#0B2545] shadow-2xs'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="العربية (Arabic)"
+              aria-pressed={lang === 'ar'}
+            >
+              AR
+            </button>
+          </div>
 
           {/* User Persona Block: 32px avatar + Fatima A. + DMT Data Steward per brief */}
           <button
@@ -217,16 +255,17 @@ export default function WorkspaceShell() {
                       isDarkScreen ? 'text-slate-400' : 'text-[#7A9CC6]'
                     }`}
                   >
-                    {grp.group}
+                    {lang === 'ar' ? grp.groupAr : grp.group}
                   </div>
                 )}
                 {grp.items.map((item) => {
                   const Icon = item.icon;
+                  const itemLabel = lang === 'ar' ? item.labelAr : item.label;
                   return (
                     <NavLink
                       key={item.to}
                       to={item.to}
-                      title={sidebarCollapsed ? item.label : undefined}
+                      title={sidebarCollapsed ? itemLabel : undefined}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all relative ${
                           isActive
@@ -251,7 +290,7 @@ export default function WorkspaceShell() {
                               isActive ? 'text-[#1F5FAD]' : 'text-current'
                             }`}
                           />
-                          {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+                          {!sidebarCollapsed && <span className="truncate">{itemLabel}</span>}
                         </>
                       )}
                     </NavLink>

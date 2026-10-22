@@ -41,6 +41,7 @@ import DigitalTwinPage from './pages/DigitalTwinPage';
 import CommandCentrePage from './pages/CommandCentrePage';
 import GeoMaturityPage from './pages/GeoMaturityPage';
 import SecurityAccessPage from './pages/SecurityAccessPage';
+import WorkspaceDashboard from './pages/WorkspaceDashboard';
 
 // Additional Proposal & Context Pages
 import About from './pages/About';
@@ -114,7 +115,8 @@ export default function App() {
 
           {/* 2. Workspace Application Shell */}
           <Route element={<WorkspaceShell />}>
-            <Route path="/workspace" element={<Navigate to="/command-centre" replace />} />
+            <Route path="/workspace" element={<WorkspaceDashboard />} />
+            <Route path="/workspace/saved" element={<WorkspaceDashboard />} />
             
             {/* Workspace-scoped Discovery */}
             <Route path="/workspace/catalogue" element={<Catalogue />} />

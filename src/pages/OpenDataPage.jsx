@@ -26,8 +26,27 @@ export default function OpenDataPage() {
       d.audience.includes('Open')
   );
 
-  const triggerDownload = (title, format) => {
-    addToast(`Initiated download: ${title} (${format})`, 'success');
+  const triggerDownload = (dataset, format) => {
+    const dataContent = {
+      type: 'FeatureCollection',
+      dataset: dataset.title,
+      license: 'Abu Dhabi Open Government License (CC-BY-4.0 Compatible)',
+      crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::3997' } },
+      features: dataset.features || []
+    };
+    const extension = format.toLowerCase().includes('json') ? 'geojson' : 'json';
+    const blob = new Blob([JSON.stringify(dataContent, null, 2)], {
+      type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${dataset.slug || 'open-data'}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    addToast(`Downloaded ${dataset.title} (${format})`, 'success');
   };
 
   const themes = ['All', 'Environment', 'Boundaries', 'Population', 'Transport', 'Land & Cadastre'];
@@ -116,66 +135,88 @@ export default function OpenDataPage() {
       </div>
 
       {/* Datasets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((ds) => (
-          <div
-            key={ds.id}
-            className="bg-white rounded-2xl p-5 border border-[#E3E8EF] shadow-xs hover:border-[#5DAA3A]/50 transition-all flex flex-col justify-between space-y-4"
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-2xl p-12 text-center border border-[#E3E8EF] shadow-xs space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-[#5DAA3A] flex items-center justify-center mx-auto shadow-2xs">
+            <Globe size={28} />
+          </div>
+          <h2 className="text-base font-bold text-[#0B2545]">No open datasets found</h2>
+          <p className="text-xs text-[#5B6B7F] max-w-md mx-auto leading-relaxed">
+            No public open datasets match your current search terms or selected theme filter.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedTheme('All');
+            }}
+            className="px-4 py-2 rounded-xl bg-[#0B2545] hover:bg-[#13315C] text-white text-xs font-semibold transition-colors cursor-pointer"
           >
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-[#5DAA3A] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  {ds.theme}
-                </span>
-                <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                  Open Licence
-                </span>
-              </div>
+            Reset Filters
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((ds) => (
+            <div
+              key={ds.id}
+              className="bg-white rounded-2xl p-5 border border-[#E3E8EF] shadow-xs hover:border-[#5DAA3A]/50 transition-all flex flex-col justify-between space-y-4"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-[#5DAA3A] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    {ds.theme}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                    Open Licence
+                  </span>
+                </div>
 
-              <Link
-                to={`/open-data/${ds.slug}`}
-                className="text-base font-bold text-[#0B2545] hover:text-[#1F5FAD] transition-colors line-clamp-2"
-              >
-                {ds.title}
-              </Link>
-
-              <div className="text-xs text-[#5B6B7F]">
-                Custodian: <strong className="text-[#0B2545]">{ds.entityShort || ds.entity}</strong>
-              </div>
-
-              <p className="text-xs text-[#5B6B7F] line-clamp-3 leading-relaxed">
-                {ds.description}
-              </p>
-            </div>
-
-            {/* Direct Download strip */}
-            <div className="pt-3 border-t border-slate-100 space-y-2">
-              <div className="flex items-center justify-between text-[11px] text-[#5B6B7F]">
-                <span>Instant Download:</span>
                 <Link
                   to={`/open-data/${ds.slug}`}
-                  className="text-xs font-semibold text-[#1F5FAD] hover:underline flex items-center gap-0.5"
+                  className="text-base font-bold text-[#0B2545] hover:text-[#1F5FAD] transition-colors line-clamp-2"
                 >
-                  Detail View <ArrowRight size={11} />
+                  {ds.title}
                 </Link>
+
+                <div className="text-xs text-[#5B6B7F]">
+                  Custodian: <strong className="text-[#0B2545]">{ds.entityShort || ds.entity}</strong>
+                </div>
+
+                <p className="text-xs text-[#5B6B7F] line-clamp-3 leading-relaxed">
+                  {ds.description}
+                </p>
               </div>
 
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {['GeoJSON', 'Shapefile', 'KML', 'CSV'].map((fmt) => (
-                  <button
-                    key={fmt}
-                    onClick={() => triggerDownload(ds.title, fmt)}
-                    className="flex-1 min-w-[60px] py-1.5 rounded-lg bg-slate-50 hover:bg-[#5DAA3A] hover:text-white border border-slate-200 text-[#0B2545] text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
+              {/* Direct Download strip */}
+              <div className="pt-3 border-t border-slate-100 space-y-2">
+                <div className="flex items-center justify-between text-[11px] text-[#5B6B7F]">
+                  <span>Instant Download:</span>
+                  <Link
+                    to={`/open-data/${ds.slug}`}
+                    className="text-xs font-semibold text-[#1F5FAD] hover:underline flex items-center gap-0.5"
                   >
-                    <DownloadSimple size={12} />
-                    {fmt}
-                  </button>
-                ))}
+                    Detail View <ArrowRight size={11} />
+                  </Link>
+                </div>
+
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {['GeoJSON', 'Shapefile', 'KML', 'CSV'].map((fmt) => (
+                    <button
+                      key={fmt}
+                      onClick={() => triggerDownload(ds, fmt)}
+                      className="flex-1 min-w-[60px] py-1.5 rounded-lg bg-slate-50 hover:bg-[#5DAA3A] hover:text-white border border-slate-200 text-[#0B2545] text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <DownloadSimple size={12} />
+                      {fmt}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Innovation GeoHack banner */}
       <div className="bg-[#0B2545] text-white rounded-2xl p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-md">

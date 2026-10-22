@@ -352,19 +352,41 @@ export default function MarketplacePage() {
 
         {/* Column 2: Flexible Product Listing Area */}
         <main className="space-y-4 min-w-0 w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredProducts.map((prod) => {
-              const isSelected = prod.id === selectedProductId;
-              return (
-                <div
-                  key={prod.id}
-                  onClick={() => handleSelectProduct(prod.id)}
-                  className={`bg-white rounded-2xl p-5 border transition-all cursor-pointer shadow-xs flex flex-col justify-between min-w-0 ${
-                    isSelected
-                      ? 'border-[#1F5FAD] ring-2 ring-[#1F5FAD]/20 bg-[#FAFBFD]'
-                      : 'border-[#E3E8EF] hover:border-[#7A9CC6] hover:bg-slate-50/50'
-                  }`}
-                >
+          {filteredProducts.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center border border-[#E3E8EF] shadow-xs space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-[#0E9F8E] flex items-center justify-center mx-auto shadow-2xs">
+                <Storefront size={28} />
+              </div>
+              <h2 className="text-base font-bold text-[#0B2545]">No marketplace products found</h2>
+              <p className="text-xs text-[#5B6B7F] max-w-md mx-auto leading-relaxed">
+                No items match your active keyword search or category filters.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedProductType('All');
+                  setSelectedProviderType('All');
+                }}
+                className="px-4 py-2 rounded-xl bg-[#0B2545] hover:bg-[#13315C] text-white text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredProducts.map((prod) => {
+                const isSelected = prod.id === selectedProductId;
+                return (
+                  <div
+                    key={prod.id}
+                    onClick={() => handleSelectProduct(prod.id)}
+                    className={`bg-white rounded-2xl p-5 border transition-all cursor-pointer shadow-xs flex flex-col justify-between min-w-0 ${
+                      isSelected
+                        ? 'border-[#1F5FAD] ring-2 ring-[#1F5FAD]/20 bg-[#FAFBFD]'
+                        : 'border-[#E3E8EF] hover:border-[#7A9CC6] hover:bg-slate-50/50'
+                    }`}
+                  >
                   <div className="space-y-2.5">
                     {/* Header badges */}
                     <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -407,6 +429,7 @@ export default function MarketplacePage() {
               );
             })}
           </div>
+          )}
         </main>
 
         {/* Column 3: Permanent Product Detail Panel on desktop (300px-360px) */}
